@@ -55,7 +55,7 @@ CONFIG_TARGET_BOARD="mvebu"
 CONFIG_TARGET_ARCH_PACKAGES="mvebu"
 CONFIG_DEFAULT_TARGET_OPTIMIZATION="-Os -pipe -march=armv7-a -mtune=cortex-a9 -mfpu=vfpv3-d16"
 CONFIG_CPU_TYPE="cortex-a9+vfpv3"
-CONFIG_LINUX_3_14=y
+CONFIG_LINUX_3_18=y
 CONFIG_DEFAULT_base-files=y
 CONFIG_DEFAULT_busybox=y
 CONFIG_DEFAULT_dnsmasq=y
@@ -2528,6 +2528,7 @@ CONFIG_PACKAGE_kmod-usb-storage-extras=y
 #
 # Voice over IP
 #
+# CONFIG_PACKAGE_kmod-dahdi is not set
 
 #
 # W1 support
@@ -2723,6 +2724,7 @@ CONFIG_PACKAGE_libpolarssl=m
 # Telephony
 #
 # CONFIG_PACKAGE_bcg729 is not set
+# CONFIG_PACKAGE_dahdi-tools-libtonezone is not set
 # CONFIG_PACKAGE_libiksemel is not set
 # CONFIG_PACKAGE_libosip2 is not set
 # CONFIG_PACKAGE_libre is not set
@@ -2778,6 +2780,7 @@ CONFIG_PACKAGE_libdaemon=y
 # CONFIG_PACKAGE_libdevmapper is not set
 # CONFIG_PACKAGE_libdmapsharing is not set
 # CONFIG_PACKAGE_libelf1 is not set
+# CONFIG_PACKAGE_libesmtp is not set
 # CONFIG_PACKAGE_libev is not set
 # CONFIG_PACKAGE_libevent is not set
 # CONFIG_PACKAGE_libevent2 is not set
@@ -2946,6 +2949,7 @@ CONFIG_PACKAGE_linux-atm=y
 # CONFIG_PACKAGE_nspr is not set
 # CONFIG_PACKAGE_p11-kit is not set
 # CONFIG_PACKAGE_protobuf is not set
+# CONFIG_PACKAGE_pthsem is not set
 # CONFIG_PACKAGE_shflags is not set
 CONFIG_PACKAGE_terminfo=y
 # CONFIG_PACKAGE_tinycdb is not set
@@ -3010,6 +3014,7 @@ CONFIG_PACKAGE_luci-app-firewall=y
 # CONFIG_PACKAGE_luci-app-p910nd is not set
 # CONFIG_PACKAGE_luci-app-pbx is not set
 # CONFIG_PACKAGE_luci-app-polipo is not set
+# CONFIG_PACKAGE_luci-app-privoxy is not set
 # CONFIG_PACKAGE_luci-app-qos is not set
 # CONFIG_PACKAGE_luci-app-radvd is not set
 # CONFIG_PACKAGE_luci-app-samba is not set
@@ -3104,6 +3109,8 @@ CONFIG_PACKAGE_luci-lib-nixio_notls=y
 #
 # Mail
 #
+# CONFIG_PACKAGE_alpine is not set
+# CONFIG_PACKAGE_alpine-nossl is not set
 # CONFIG_PACKAGE_bogofilter is not set
 # CONFIG_PACKAGE_dovecot is not set
 # CONFIG_PACKAGE_fdm is not set
@@ -3401,6 +3408,7 @@ CONFIG_PACKAGE_ddns-scripts=y
 #
 # Routing and Redirection
 #
+# CONFIG_PACKAGE_babel-pinger is not set
 # CONFIG_PACKAGE_babeld is not set
 # CONFIG_PACKAGE_babels is not set
 # CONFIG_PACKAGE_batmand is not set
@@ -3519,11 +3527,9 @@ CONFIG_PACKAGE_tc=y
 # Time Synchronization
 #
 # CONFIG_PACKAGE_ntp-keygen is not set
-# CONFIG_PACKAGE_ntp-keygen-ssl is not set
 # CONFIG_PACKAGE_ntp-utils is not set
 CONFIG_PACKAGE_ntpclient=y
 # CONFIG_PACKAGE_ntpd is not set
-# CONFIG_PACKAGE_ntpd-ssl is not set
 # CONFIG_PACKAGE_ntpdate is not set
 
 #
@@ -3613,7 +3619,7 @@ CONFIG_PACKAGE_openvpn-easy-rsa=y
 # CONFIG_PACKAGE_uanytun-nettle is not set
 # CONFIG_PACKAGE_uanytun-nocrypt is not set
 # CONFIG_PACKAGE_uanytun-sslcrypt is not set
-CONFIG_PACKAGE_xl2tpd=y
+# CONFIG_PACKAGE_xl2tpd is not set
 
 #
 # Version Control Systems
@@ -3668,7 +3674,6 @@ CONFIG_PACKAGE_6to4=y
 # CONFIG_PACKAGE_dhcpcd is not set
 # CONFIG_PACKAGE_dmapd is not set
 CONFIG_PACKAGE_ds-lite=y
-# CONFIG_PACKAGE_eapol-test is not set
 CONFIG_PACKAGE_etherwake=y
 # CONFIG_PACKAGE_ethtool is not set
 # CONFIG_PACKAGE_gre is not set
@@ -3676,8 +3681,6 @@ CONFIG_PACKAGE_etherwake=y
 # CONFIG_PACKAGE_hnetd is not set
 # CONFIG_PACKAGE_hostap-utils is not set
 CONFIG_PACKAGE_hostapd=y
-# CONFIG_PACKAGE_hostapd-common is not set
-CONFIG_PACKAGE_hostapd-common-old=y
 # CONFIG_PACKAGE_hostapd-mini is not set
 CONFIG_PACKAGE_hostapd-utils=y
 # CONFIG_PACKAGE_ibrdtn-tools is not set
@@ -3734,7 +3737,7 @@ CONFIG_PACKAGE_ppp-mod-pppoa=y
 CONFIG_PACKAGE_ppp-mod-pppoe=y
 CONFIG_PACKAGE_ppp-mod-pppol2tp=y
 CONFIG_PACKAGE_ppp-mod-pptp=y
-# CONFIG_PACKAGE_ppp-mod-radius is not set
+CONFIG_PACKAGE_ppp-mod-radius=y
 # CONFIG_PACKAGE_ppp-multilink is not set
 # CONFIG_PACKAGE_pppdump is not set
 # CONFIG_PACKAGE_pppstats is not set
@@ -3774,7 +3777,6 @@ CONFIG_WPA_MSG_MIN_PRIORITY=3
 # CONFIG_DRIVER_WEXT_SUPPORT is not set
 # CONFIG_DRIVER_11N_SUPPORT is not set
 # CONFIG_PACKAGE_wpa-supplicant-mini is not set
-# CONFIG_PACKAGE_wpa-supplicant-p2p is not set
 # CONFIG_PACKAGE_wpad is not set
 # CONFIG_PACKAGE_wpad-mini is not set
 # CONFIG_PACKAGE_wshaper is not set
@@ -3867,6 +3869,12 @@ CONFIG_PACKAGE_xfs-mkfs=y
 # CONFIG_PACKAGE_liblo-utils is not set
 
 #
+# Telephony
+#
+# CONFIG_PACKAGE_dahdi-cfg is not set
+# CONFIG_PACKAGE_dahdi-monitor is not set
+
+#
 # Terminal
 #
 # CONFIG_PACKAGE_agetty is not set
@@ -3943,6 +3951,7 @@ CONFIG_PACKAGE_swap-utils=y
 # CONFIG_PACKAGE_freecwmp is not set
 # CONFIG_PACKAGE_freenetconfd is not set
 # CONFIG_PACKAGE_freesub is not set
+# CONFIG_PACKAGE_ftdi_eeprom is not set
 # CONFIG_PACKAGE_getopt is not set
 # CONFIG_PACKAGE_gnupg is not set
 # CONFIG_PACKAGE_grep is not set
@@ -3990,7 +3999,6 @@ CONFIG_PACKAGE_openssl-util=y
 # CONFIG_PACKAGE_owipcalc is not set
 # CONFIG_PACKAGE_pciutils is not set
 # CONFIG_PACKAGE_pcscd is not set
-# CONFIG_PACKAGE_pps-tools is not set
 CONFIG_PACKAGE_procd-nand=y
 # CONFIG_PACKAGE_procd-nand-firstboot is not set
 # CONFIG_PACKAGE_procps is not set
@@ -4030,10 +4038,12 @@ CONFIG_PACKAGE_shadow-utils=y
 # CONFIG_PACKAGE_sispmctl is not set
 # CONFIG_PACKAGE_smartd is not set
 # CONFIG_PACKAGE_smartmontools is not set
+# CONFIG_PACKAGE_smstools3 is not set
 # CONFIG_PACKAGE_spidev-test is not set
 # CONFIG_PACKAGE_stm32flash is not set
 # CONFIG_PACKAGE_stoken is not set
 # CONFIG_PACKAGE_strace is not set
+# CONFIG_PACKAGE_taskwarrior is not set
 # CONFIG_PACKAGE_tcsh is not set
 # CONFIG_PACKAGE_tiff-utils is not set
 # CONFIG_PACKAGE_tmux is not set

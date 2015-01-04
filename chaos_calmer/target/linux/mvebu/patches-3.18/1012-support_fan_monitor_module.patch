@@ -1,8 +1,8 @@
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -506,6 +506,13 @@ config MAMBA_LED
- 	help
- 	  This driver control the LED on Mamba board 
+@@ -515,6 +515,13 @@ config VEXPRESS_SYSCFG
+ 	  bus. System Configuration interface is one of the possible means
+ 	  of generating transactions on this bus.
  
 +config FANCTRL
 +	tristate "FAN Control Module"
@@ -16,11 +16,14 @@
  source "drivers/misc/cb710/Kconfig"
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -49,3 +49,4 @@ obj-y				+= carma/
+@@ -47,6 +47,7 @@ obj-y				+= lis3lv02d/
+ obj-y				+= carma/
  obj-$(CONFIG_USB_SWITCH_FSA9480) += fsa9480.o
  obj-$(CONFIG_ALTERA_STAPL)	+=altera-stapl/
- obj-$(CONFIG_MAMBA_LED)		+= mamba_led.o
-+obj-$(CONFIG_FANCTRL)		+= fan_ctrl.o
++obj-$(CONFIG_FANCTRL)          += fan_ctrl.o
+ obj-$(CONFIG_INTEL_MEI)		+= mei/
+ obj-$(CONFIG_VMWARE_VMCI)	+= vmw_vmci/
+ obj-$(CONFIG_LATTICE_ECP3_CONFIG)	+= lattice-ecp3-config.o
 --- /dev/null
 +++ b/drivers/misc/fan_ctrl.c
 @@ -0,0 +1,428 @@
