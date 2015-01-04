@@ -1,0 +1,76 @@
+#!/bin/sh
+. /lib/functions.sh
+. /lib/functions/network.sh
+include /lib/network
+#set -euf
+local scriptname
+scriptname="$(basename $0)"
+
+log_message() {
+	/usr/bin/logger "$scriptname: $1"
+}
+
+blinking_amber() {
+	/usr/sbin/ledctrl 0 255 500 500
+}
+
+wan_amber() {
+	/usr/sbin/ledctrl 0 $1
+}
+
+blinking_white() {
+	/usr/sbin/ledctrl 1 255 700 700
+}
+
+wan_white() {
+	/usr/sbin/ledctrl 1 $1
+}
+
+ping_host() {
+	local host count timeout gateway
+	host=$(/usr/sbin/ip route | awk '/default/ { print $3 }')
+
+	count=3
+	timeout=5
+
+	/bin/ping -q -c $count -w $timeout $host >/dev/null 2>&1 && gateway=up
+	
+	if [ $gateway = "up"  ]
+	then
+		wan_amber off
+		wan_white on
+	else
+		wan_white off
+		wan_amber on
+		log_message "Failed to ping gateway $host"
+	fi
+}
+
+local wanportstatus
+#echo "WAN LED MONITOR"
+while true
+do
+	wanportstatus="$(cat /sys/class/net/eth1/operstate)"
+	#echo "Wan physical status" $wanportstatus
+	if [ ! $? ]
+	then
+		log_message "Could not determine wan port status"
+		wan_amber off
+		wan_white off
+		blinking_amber
+	else
+		if [ $wanportstatus = "up" ]
+		then
+			if [ did_obtain_wan_ip ]
+			then
+				ping_host
+			fi
+		else
+			log_message "No physical WAN cable"
+			wan_amber off
+			wan_white off
+			blinking_amber 
+		fi
+	fi
+	sleep 2
+done

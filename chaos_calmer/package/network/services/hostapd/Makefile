@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2014 OpenWrt.org
+# Copyright (C) 2006-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,19 +8,23 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hostapd
-PKG_VERSION:=2014-10-25
+#PKG_VERSION:=20130405
+PKG_VERSION:=0.8-snapshot
+#hostapd-0.8-snapshot.tar.gz
 PKG_RELEASE:=1
-PKG_REV:=01e2231fdc4fbec61fbc382238e3606a1d2826e4
+#PKG_REV:=f2f66ad7e805218468aa041985dccaf8719c296e
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=git://w1.fi/srv/git/hostap.git
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
+#PKG_SOURCE_URL:=git://w1.fi/srv/git/hostap.git
+PKG_SOURCE_URL:=http://hostap.epitest.fi/releases/snapshots/
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
-PKG_SOURCE_PROTO:=git
-# PKG_MIRROR_MD5SUM:=4e7c1f97edd7514535056fce54ae053a
+#PKG_SOURCE_PROTO:=git
+#PKG_MIRROR_MD5SUM:=5dff9bc3b8fbd9ef8a66273d5adee5a3
+PKG_MIRROR_MD5SUM:=31ce79e921d4b1a4dc7d0a65d155852c
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
-PKG_LICENSE:=BSD-3-Clause
 
 PKG_BUILD_PARALLEL:=1
 
@@ -30,7 +34,7 @@ PKG_BUILD_DEPENDS:= \
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_WPA_SUPPLICANT_NO_TIMESTAMP_CHECK \
 	CONFIG_PACKAGE_kmod-ath9k \
-	CONFIG_PACKAGE_kmod-cfg80211 \
+	CONFIG_PACKAGE_kmod-mac80211 \
 	CONFIG_PACKAGE_kmod-madwifi \
 	CONFIG_PACKAGE_hostapd \
 	CONFIG_PACKAGE_hostapd-mini \
@@ -65,12 +69,13 @@ ifneq ($(CONFIG_DRIVER_11N_SUPPORT),)
 endif
 
 DRIVER_MAKEOPTS= \
-	CONFIG_DRIVER_NL80211=$(CONFIG_PACKAGE_kmod-cfg80211) \
+	CONFIG_DRIVER_NL80211=$(CONFIG_PACKAGE_kmod-mac80211) \
 	CONFIG_DRIVER_MADWIFI=$(CONFIG_PACKAGE_kmod-madwifi) \
 	CONFIG_DRIVER_HOSTAP=$(CONFIG_PACKAGE_kmod-hostap) \
 	CONFIG_IEEE80211N=$(HOSTAPD_IEEE80211N) \
 	CONFIG_IEEE80211W=$(CONFIG_PACKAGE_kmod-ath9k) \
 	CONFIG_DRIVER_WEXT=$(CONFIG_DRIVER_WEXT_SUPPORT) \
+	$(if $(CONFIG_WPA_RFKILL_SUPPORT),NEED_RFKILL=y)
 
 ifneq ($(LOCAL_TYPE),hostapd)
   ifdef CONFIG_WPA_SUPPLICANT_OPENSSL
@@ -82,19 +87,11 @@ ifneq ($(LOCAL_TYPE),hostapd)
   ifdef CONFIG_WPA_SUPPLICANT_NO_TIMESTAMP_CHECK
     TARGET_CFLAGS += -DNO_TIMESTAMP_CHECK
   endif
-  ifdef CONFIG_WPA_RFKILL_SUPPORT)
-    DRIVER_MAKEOPTS += NEED_RFKILL=y
-  endif
   DRIVER_MAKEOPTS += \
 	CONFIG_DRIVER_ROBOSWITCH=$(CONFIG_PACKAGE_kmod-switch)
 endif
 
-ifdef CONFIG_USE_EGLIBC
-  TARGET_LDFLAGS += -lrt
-  TARGET_LDFLAGS_C += -lrt
-endif
-
-DRV_DEPENDS:=+PACKAGE_kmod-cfg80211:libnl-tiny @(!TARGET_avr32||BROKEN)
+DRV_DEPENDS:=+PACKAGE_kmod-mac80211:libnl-tiny @(!TARGET_avr32||BROKEN)
 
 define Package/hostapd/Default
   SECTION:=net
@@ -108,7 +105,6 @@ define Package/hostapd
 $(call Package/hostapd/Default)
   TITLE+= (full)
   VARIANT:=full
-  CONFLICTS:=wpad wpad-mini
 endef
 
 define Package/hostapd/description
@@ -120,7 +116,6 @@ define Package/hostapd-mini
 $(call Package/hostapd/Default)
   TITLE+= (WPA-PSK only)
   VARIANT:=mini
-  CONFLICTS:=wpad wpad-mini
 endef
 
 define Package/hostapd-mini/description
@@ -174,7 +169,6 @@ define Package/wpa-supplicant
   TITLE:=WPA Supplicant
   URL:=http://hostap.epitest.fi/wpa_supplicant/
   DEPENDS:=$(DRV_DEPENDS) +WPA_SUPPLICANT_OPENSSL:libopenssl
-  CONFLICTS:=wpad wpad-mini
   VARIANT:=supplicant-full
 endef
 
@@ -186,23 +180,10 @@ define Package/wpa-supplicant/config
 	source "$(SOURCE)/Config.in"
 endef
 
-define Package/wpa-supplicant-p2p
-  $(Package/wpa-supplicant)
-  TITLE:=WPA Supplicant (with Wi-Fi P2P support)
-  DEPENDS:=$(DRV_DEPENDS)
-  CONFLICTS:=wpad wpad-mini
-  VARIANT:=supplicant-p2p
-endef
-
-define Package/wpa-supplicant-p2p/Description
-  WPA Supplicant (with Wi-Fi P2P support)
-endef
-
 define Package/wpa-supplicant-mini
   $(Package/wpa-supplicant)
   TITLE:=WPA Supplicant (minimal version)
   DEPENDS:=$(DRV_DEPENDS)
-  CONFLICTS:=wpad wpad-mini
   VARIANT:=supplicant-mini
 endef
 
@@ -213,7 +194,7 @@ endef
 define Package/wpa-cli
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=@PACKAGE_wpa-supplicant||PACKAGE_wpa-supplicant-p2p||PACKAGE_wpad-mini||PACKAGE_wpad
+  DEPENDS:=@PACKAGE_wpa-supplicant||PACKAGE_wpad-mini||PACKAGE_wpad
   TITLE:=WPA Supplicant command line interface
 endef
 
@@ -221,32 +202,12 @@ define Package/wpa-cli/Description
   WPA Supplicant control utility
 endef
 
-define Package/hostapd-common
-  TITLE:=hostapd/wpa_supplicant common support files
-  SECTION:=net
-  CATEGORY:=Network
-endef
-
-define Package/hostapd-common-old
-  TITLE:=hostapd/wpa_supplicant common support files (legacy drivers)
-  SECTION:=net
-  CATEGORY:=Network
-endef
-
-define Package/eapol-test
-  TITLE:=802.1x authentication test utility
-  SECTION:=net
-  CATEGORY:=Network
-  VARIANT:=supplicant-full
-  DEPENDS:=$(DRV_DEPENDS)
-endef
-
 
 ifneq ($(wildcard $(PKG_BUILD_DIR)/.config_*),$(subst .configured_,.config_,$(STAMP_CONFIGURED)))
   define Build/Configure/rebuild
 	$(FIND) $(PKG_BUILD_DIR) -name \*.o -or -name \*.a | $(XARGS) rm -f
 	rm -f $(PKG_BUILD_DIR)/hostapd/hostapd
-	rm -f $(PKG_BUILD_DIR)/wpa_supplicant/wpa_supplicant
+#	rm -f $(PKG_BUILD_DIR)/wpa_supplicant/wpa_supplicant
 	rm -f $(PKG_BUILD_DIR)/.config_*
 	touch $(subst .configured_,.config_,$(STAMP_CONFIGURED))
   endef
@@ -254,10 +215,8 @@ endif
 
 define Build/Configure
 	$(Build/Configure/rebuild)
-	$(if $(wildcard ./files/hostapd-$(LOCAL_VARIANT).config), \
-		$(CP) ./files/hostapd-$(LOCAL_VARIANT).config $(PKG_BUILD_DIR)/hostapd/.config \
-	)
-	$(CP) ./files/wpa_supplicant-$(LOCAL_VARIANT).config $(PKG_BUILD_DIR)/wpa_supplicant/.config
+	$(CP) ./files/hostapd-$(LOCAL_VARIANT).config $(PKG_BUILD_DIR)/hostapd/.config
+#	$(CP) ./files/wpa_supplicant-$(LOCAL_VARIANT).config $(PKG_BUILD_DIR)/wpa_supplicant/.config
 endef
 
 TARGET_CPPFLAGS := \
@@ -275,7 +234,7 @@ ifeq ($(findstring supplicant,$(BUILD_VARIANT)),)
   TARGET_LDFLAGS += -lubox -lubus
 endif
 
-ifdef CONFIG_PACKAGE_kmod-cfg80211
+ifdef CONFIG_PACKAGE_kmod-mac80211
   TARGET_LDFLAGS += -lm -lnl-tiny
 endif
 
@@ -285,7 +244,6 @@ define Build/RunMake
 		$(TARGET_CONFIGURE_OPTS) \
 		$(DRIVER_MAKEOPTS) \
 		LIBS="$(TARGET_LDFLAGS)" \
-		LIBS_c="$(TARGET_LDFLAGS_C)" \
 		BCHECK= \
 		$(2)
 endef
@@ -326,34 +284,20 @@ define Build/Compile/supplicant
 	)
 endef
 
-define Build/Compile/supplicant-full
-	$(call Build/RunMake,wpa_supplicant, \
-		eapol_test \
-	)
-endef
-
 define Build/Compile
 	$(Build/Compile/$(LOCAL_TYPE))
-	$(Build/Compile/$(BUILD_VARIANT))
 endef
 
 define Install/hostapd
+	$(INSTALL_DIR) $(1)/lib/wifi
+	$(INSTALL_DATA) ./files/hostapd.sh $(1)/lib/wifi/hostapd.sh
 	$(INSTALL_DIR) $(1)/usr/sbin
 endef
 
 define Install/supplicant
-	$(INSTALL_DIR) $(1)/usr/sbin
-endef
-
-define Package/hostapd-common/install
-	$(INSTALL_DIR) $(1)/lib/netifd
-	$(INSTALL_DATA) ./files/netifd.sh $(1)/lib/netifd/hostapd.sh
-endef
-
-define Package/hostapd-common-old/install
 	$(INSTALL_DIR) $(1)/lib/wifi
-	$(INSTALL_DATA) ./files/hostapd.sh $(1)/lib/wifi/hostapd.sh
 	$(INSTALL_DATA) ./files/wpa_supplicant.sh $(1)/lib/wifi/wpa_supplicant.sh
+	$(INSTALL_DIR) $(1)/usr/sbin
 endef
 
 define Package/hostapd/install
@@ -364,9 +308,16 @@ Package/hostapd-mini/install = $(Package/hostapd/install)
 
 ifneq ($(LOCAL_TYPE),supplicant)
   define Package/hostapd-utils/install
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/rc.button
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/hotplug.d/button
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hostapd/hostapd_cli $(1)/usr/sbin/
-	$(INSTALL_BIN) ./files/wps-hotplug.sh $(1)/etc/rc.button/wps
+	$(INSTALL_DATA) ./files/wps-hotplug.sh $(1)/etc/hotplug.d/button/50-wps
+	$(INSTALL_DIR) $(1)/lib/wifi/
+	$(INSTALL_BIN) ./files/wps-hotplug.sh $(1)/lib/wifi/wps-hotplug.sh
+	$(if $(CONFIG_PROCD_INIT),
+		$(INSTALL_DIR) $(1)/etc/rc.button/
+		$(INSTALL_BIN) ./files/wps-hotplug.sh $(1)/etc/rc.button/wps,
+		$(INSTALL_DATA) ./files/wps-hotplug.sh $(1)/etc/hotplug.d/button/50-wps
+	)
   endef
 endif
 
@@ -374,8 +325,8 @@ define Package/wpad/install
 	$(call Install/hostapd,$(1))
 	$(call Install/supplicant,$(1))
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wpad $(1)/usr/sbin/
-	$(LN) wpad $(1)/usr/sbin/hostapd
-	$(LN) wpad $(1)/usr/sbin/wpa_supplicant
+	ln -sf wpad $(1)/usr/sbin/hostapd
+	ln -sf wpad $(1)/usr/sbin/wpa_supplicant
 endef
 Package/wpad-mini/install = $(Package/wpad/install)
 
@@ -384,19 +335,11 @@ define Package/wpa-supplicant/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wpa_supplicant/wpa_supplicant $(1)/usr/sbin/
 endef
 Package/wpa-supplicant-mini/install = $(Package/wpa-supplicant/install)
-Package/wpa-supplicant-p2p/install = $(Package/wpa-supplicant/install)
 
 ifneq ($(LOCAL_TYPE),hostapd)
   define Package/wpa-cli/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(CP) $(PKG_BUILD_DIR)/wpa_supplicant/wpa_cli $(1)/usr/sbin/
-  endef
-endif
-
-ifeq ($(BUILD_VARIANT),supplicant-full)
-  define Package/eapol-test/install
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(CP) $(PKG_BUILD_DIR)/wpa_supplicant/eapol_test $(1)/usr/sbin/
   endef
 endif
 
@@ -406,9 +349,5 @@ $(eval $(call BuildPackage,wpad))
 $(eval $(call BuildPackage,wpad-mini))
 $(eval $(call BuildPackage,wpa-supplicant))
 $(eval $(call BuildPackage,wpa-supplicant-mini))
-$(eval $(call BuildPackage,wpa-supplicant-p2p))
 $(eval $(call BuildPackage,wpa-cli))
 $(eval $(call BuildPackage,hostapd-utils))
-$(eval $(call BuildPackage,hostapd-common))
-$(eval $(call BuildPackage,hostapd-common-old))
-$(eval $(call BuildPackage,eapol-test))

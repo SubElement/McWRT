@@ -5,6 +5,36 @@ check_wifi_sw() {
 	return 1
 }
 
+find_marvell_phy() {
+        local device="$1"
+	logger "chad- find_marvell_phy() $1"
+
+        local macaddr="$(config_get "$device" macaddr | tr 'A-Z' 'a-z')"
+        config_get phy "$device" phy
+	logger "chad- macaddr=$macaddr"
+	logger "chad- phy=$phy"
+#        [ -z "$phy" -a -n "$macaddr" ] && {
+#		logger "chad- if1"
+#                cd /proc/net/hostap
+#                for phy in $(ls -d wlan* 2>&-); do
+#                        [ "$macaddr" = "$(cat /sys/class/net/${phy}/address)" ] || continue
+#                        config_set "$device" phy "$phy"
+#                        break
+#                done
+#                config_get phy "$device" phy
+#        }
+#        [ -n "$phy" -a -d "/proc/net/hostap/$phy" ] || {
+#                echo "phy for wifi device $1 not found"
+#		logger "chad- phy for wifi device $1 not found"
+#                return 1
+#        }
+        [ -z "$macaddr" ] && {
+                config_set "$device" macaddr "$(cat /sys/class/net/${phy}/address)"
+		logger "chad- config_set $device macaddr $(cat /sys/class/net/${phy}/address)"
+        }
+        return 0
+}
+
 scan_marvell() {
 	local device="$1"
 	local wds
@@ -71,11 +101,19 @@ disable_marvell() (
 enable_marvell() {
 	
 	local device="$1"
-
+	logger "chad- enable_marvell $1"
+	config_set "$device" phy "$device"
+	find_marvell_phy "$device" || return 0
+	config_get phy "$device" phy
 	echo $device > /tmp/test
 	config_get channel "$device" channel
 	config_get vifs "$device" vifs
 	config_get txpower "$device" txpower
+	
+	logger "chad- enable_marvell phy=$phy"
+	logger "chad- enable_marvell channel=$channel"
+	logger "chad- enable_marvell vifs=$vifs"
+	logger "chad- enable_marvell txpower=$txpower"
 
 	[ auto = "$channel" ] && channel=0
 
@@ -87,6 +125,8 @@ enable_marvell() {
 	config_get wmm "$device" wmm
 	config_get htbw "$device" htbw
     config_get hwmode "$device" hwmode
+
+	logger "chad- enable_marvell hwmode=$hwmode"
 
     case "$hwmode" in
        11b)  hwmode=1;;
@@ -101,30 +141,45 @@ enable_marvell() {
        *)    hwmode=7;;
     esac
 
-    iwpriv "$device" opmode $hwmode
+	logger "chad- enable_marvell hwmode=$hwmode"
 
+    iwpriv "$device" opmode $hwmode
+	logger "chad- iwpriv $device opmode $hwmode"	
 	iwpriv "$device" wmm $wmm
+	logger "chad- iwpriv $device wmm $wmm"
 	iwpriv "$device" htbw $htbw
+	logger "chad- iwpriv $device htbw $htbw"
 	iwconfig "$device" channel $channel >/dev/null 2>/dev/null
+	logger "chad- iwconfig $device channel $channel"
 	iwpriv "$device" setcmd "loadtxpwrtable /lib/Mamba_FCC_v1.2_5G4TX.ini"
+	logger "chad- iwpriv $device setcmd loadtxpwrtable /lib/Mamba_FCC_v1.2_5G4TX.ini"
 	ifconfig "$device" up
+	logger "chad- ifconfig $device up"
 	sleep 1
 
 	for vif in $vifs; do
 		local start_hostapd= vif_txpower= nosbeacon=
 		config_get ifname "$vif" ifname
+		logger "chad- ifname=$ifname"
 		config_get ampdutx "$vif" ampdutx
+		logger "chad- ampdutx=$ampdutx"
 		config_get enc "$vif" encryption
+		logger "chad- enc=$enc"
 
 		iwpriv $ifname ampdutx 1
+		logger "chad- iwpriv $ifname ampdutx 1"
 		
 		config_get amsdu "$vif" amsdu
+		logger "chad- amsdu=$amsdu"
 		iwpriv $ifname amsdu 1
+		logger "chad- iwpriv $ifname amsdu 1"
 		
 		config_set "$vif" ifname "$ifname"
 		
 		config_get_bool hidden "$vif" hidden 0
+		logger "chad- hidden=$hidden"
 		iwpriv "$ifname" hidessid "$hidden"
+		logger "chad- iwpriv $ifname hidessid $hidden"
 		
 		case "$enc" in
 			wep*)
@@ -145,21 +200,26 @@ enable_marvell() {
 			;;
 			psk*|wpa*)
 				start_hostapd=1
+				logger "chad- start_hostapd=$start_hostapd"	
 				config_get key "$vif" key
+				logger "chad- key=$key"
 			;;
 		esac
 		
 		config_get maclist "$vif" maclist
+		logger "chad- maclist=$maclist"
 		[ -n "$maclist" ] && {
 			# flush MAC list
 			iwpriv "$ifname" filtermac deleteall
 			for mac in $maclist; do
 				mv_mac=`echo "$mac" | sed "s/://g"`
 				iwpriv "$ifname" filtermac "add $mv_mac"
+				logger "chad- iwpriv $ifname filtermac add $mv_mac"
 			done
 		}
 
 		config_get macpolicy "$vif" macpolicy
+		logger "chad- macpolicy=$macpolicy"
 		case "$macpolicy" in
 			allow)
 				iwpriv "$ifname" filter 1
@@ -173,18 +233,24 @@ enable_marvell() {
 		esac
 		
 		ifconfig "$ifname" up
+		logger "chad- ifconfig $ifname up"
 
 		sleep 1
 
 		iwconfig "$device" commit
+		logger "chad- iwconfig $device commit"
 
 		config_get ssid "$vif" ssid
+		logger "chad- ssid=$ssid"
 		[ -n "$ssid" ] && {
 			iwconfig "$ifname" essid on
+			logger "chad- iwconfig $ifname essid on"
 			iwconfig "$ifname" essid "$ssid"
+			logger "chad- iwconfig $ifname essid $ssid"
 		}
 
 		set_wifi_up "$vif" "$ifname"
+		logger "chad- mode=$mode"
 
 		case "$mode:$enc" in
 			ap:*)
@@ -194,8 +260,10 @@ enable_marvell() {
 				if [ -n "$start_hostapd" ] && eval "type hostapd_setup_vif" 2>/dev/null >/dev/null; then
 					hostapd_setup_vif "$vif" marvell || {
 						echo "enable_marvell($device): Failed to set up hostapd for interface $ifname" >&2
+						logger "chad- enable_marvell($device): Failed to set up hostapd for interface $ifname"
 						# make sure this wifi interface won't accidentally stay open without encryption
 						ifconfig "$ifname" down
+						logger "chad- ifconfig $ifname down"
 						continue
 					}
 				fi
