@@ -27,42 +27,25 @@ wan_white() {
 }
 
 ping_host() {
-	local host count timeout error
+	local host count timeout gateway
 	host=$(/usr/sbin/ip route | awk '/default/ { print $3 }')
+
 	count=3
 	timeout=5
-	error="$(/bin/ping -q -c $count -w $timeout $host 2>&1 > /dev/null)"
 
-	if [ $? ]
+	/bin/ping -q -c $count -w $timeout $host >/dev/null 2>&1 && gateway=up
+	
+	if [ $gateway = "up"  ]
 	then
 		wan_amber off
 		wan_white on
 	else
 		wan_white off
 		wan_amber on
-		log_message "Failed to ping $host -- $error"
+		log_message "Failed to ping gateway $host"
 	fi
 }
 
-did_obtain_wan_ip() {
-	local wanif wanipaddr
-	wan_white off
-	wan_amber on
-	while [ ! network_find_wan wanif ]
-	do
-		log_message "Waiting for netifd to register wan interface"
-		scan_interfaces
-		sleep 1
-	done
-	while [ ! network_get_ipaddr wanipaddr "$wanif" ]
-	do
-		log_message "Obtaining IP address on if: $wanif"
-		sleep 1	
-	done
-	return true
-}
-
-#FIXME: would hotplug better serve us here?
 local wanportstatus
 #echo "WAN LED MONITOR"
 while true
@@ -82,8 +65,6 @@ do
 			then
 				ping_host
 			fi
-		#If the carrier has only 2 possible states...
-		#elif [ $wanportstatus = "Down" ]; then
 		else
 			log_message "No physical WAN cable"
 			wan_amber off
