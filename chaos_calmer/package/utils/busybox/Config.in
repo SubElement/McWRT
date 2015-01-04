@@ -12,10 +12,10 @@ config BUSYBOX_CUSTOM
 
           Unless you know what you are doing, you should leave this as 'n'
 
-	source "Config-defaults.in"
+	source "package/utils/busybox/Config-defaults.in"
 
 	if BUSYBOX_CUSTOM
-	source "config/Config.in"
+	source "package/utils/busybox/config/Config.in"
 	endif
 
 config BUSYBOX_USE_LIBRPC
