@@ -37,14 +37,4 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  sgold			MACH_SGOLD		SGOLD			529
  oscar			MACH_OSCAR		OSCAR			530
  epxa4usb2		MACH_EPXA4USB2		EPXA4USB2		531
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -843,7 +843,7 @@ void add_disk_randomness(struct gendisk
-  */
- void random_input_words(__u32 *buf, size_t wordcount, int ent_count)
- {
--	mix_pool_bytes(&input_pool, buf, wordcount*4);
-+	mix_pool_bytes(&input_pool, buf, wordcount*4, NULL);
- 
- 	credit_entropy_bits(&input_pool, ent_count);
- 
+

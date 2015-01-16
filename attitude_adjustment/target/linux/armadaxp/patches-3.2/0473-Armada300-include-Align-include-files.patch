@@ -15,7 +15,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
 
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -1629,7 +1629,7 @@ struct file_operations {
+@@ -1620,7 +1620,7 @@ struct file_operations {
  	int (*flock) (struct file *, int, struct file_lock *);
  	ssize_t (*splice_write)(struct pipe_inode_info *, struct file *, loff_t *, size_t, unsigned int);
  	ssize_t (*splice_read)(struct file *, loff_t *, struct pipe_inode_info *, size_t, unsigned int);
@@ -26,7 +26,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  	long (*fallocate)(struct file *file, int mode, loff_t offset,
 --- a/include/linux/kernel.h
 +++ b/include/linux/kernel.h
-@@ -542,6 +542,17 @@ static inline void ftrace_dump(enum ftra
+@@ -529,6 +529,17 @@ static inline void ftrace_dump(enum ftra
  #endif /* CONFIG_TRACING */
  
  /*

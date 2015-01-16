@@ -181,7 +181,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		retval = req->status;
  
  		/* FIXME check resulting data pattern */
-@@ -1053,7 +1089,7 @@ test_ctrl_queue(struct usbtest_dev *dev,
+@@ -1050,7 +1086,7 @@ test_ctrl_queue(struct usbtest_dev *dev,
  			goto cleanup;
  		}
  		req.wLength = cpu_to_le16(len);
@@ -190,7 +190,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		if (!u)
  			goto cleanup;
  
-@@ -1119,14 +1155,15 @@ static void unlink1_callback(struct urb
+@@ -1116,14 +1152,15 @@ static void unlink1_callback(struct urb
  	}
  }
  
@@ -208,7 +208,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  	if (!urb)
  		return -ENOMEM;
  	urb->context = &completion;
-@@ -1147,7 +1184,7 @@ static int unlink1(struct usbtest_dev *d
+@@ -1144,7 +1181,7 @@ static int unlink1(struct usbtest_dev *d
  	/* unlinking that should always work.  variable delay tests more
  	 * hcd states and code paths, even with little other system load.
  	 */
@@ -217,7 +217,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  	if (async) {
  		while (!completion_done(&completion)) {
  			retval = usb_unlink_urb(urb);
-@@ -1189,14 +1226,15 @@ static int unlink1(struct usbtest_dev *d
+@@ -1186,14 +1223,15 @@ static int unlink1(struct usbtest_dev *d
  				0 : retval - 2000;
  }
  
@@ -236,19 +236,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  	return retval;
  }
  
-@@ -1393,9 +1431,9 @@ static int halt_simple(struct usbtest_de
- 	struct usb_device	*udev = testdev_to_usbdev(dev);
- 
- 	if (udev->speed == USB_SPEED_SUPER)
--		urb = simple_alloc_urb(udev, 0, 1024);
-+		urb = simple_alloc_urb(udev, 0, NULL, 1024);
- 	else
--		urb = simple_alloc_urb(udev, 0, 512);
-+		urb = simple_alloc_urb(udev, 0, NULL, 512);
- 	if (urb == NULL)
- 		return -ENOMEM;
- 
-@@ -1646,9 +1684,9 @@ test_iso_queue(struct usbtest_dev *dev,
+@@ -1639,9 +1677,9 @@ test_iso_queue(struct usbtest_dev *dev,
  	unsigned		i;
  	unsigned long		packets = 0;
  	int			status = 0;
@@ -260,7 +248,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		return -EDOM;
  
  	memset(&context, 0, sizeof context);
-@@ -1692,9 +1730,6 @@ test_iso_queue(struct usbtest_dev *dev,
+@@ -1685,9 +1723,6 @@ test_iso_queue(struct usbtest_dev *dev,
  				spin_unlock_irq(&context.lock);
  				goto fail;
  			}
@@ -270,7 +258,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  			context.pending--;
  			context.submit_error = 1;
  			break;
-@@ -1704,10 +1739,6 @@ test_iso_queue(struct usbtest_dev *dev,
+@@ -1697,10 +1732,6 @@ test_iso_queue(struct usbtest_dev *dev,
  
  	wait_for_completion(&context.done);
  
@@ -281,7 +269,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  	/*
  	 * Isochronous transfers are expected to fail sometimes.  As an
  	 * arbitrary limit, we will report an error if any submissions
-@@ -1719,7 +1750,6 @@ test_iso_queue(struct usbtest_dev *dev,
+@@ -1712,7 +1743,6 @@ test_iso_queue(struct usbtest_dev *dev,
  		status = -EACCES;
  	else if (context.errors > context.packet_count / 10)
  		status = -EIO;
@@ -289,7 +277,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  
  fail:
  	for (i = 0; i < param->sglen; i++) {
-@@ -1739,7 +1769,7 @@ static int test_unaligned_bulk(
+@@ -1732,7 +1762,7 @@ static int test_unaligned_bulk(
  {
  	int retval;
  	struct urb *urb = usbtest_alloc_urb(
@@ -298,7 +286,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  
  	if (!urb)
  		return -ENOMEM;
-@@ -1846,7 +1876,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1839,7 +1869,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev,
  				"TEST 1:  write %d bytes %u times\n",
  				param->length, param->iterations);
@@ -307,7 +295,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		if (!urb) {
  			retval = -ENOMEM;
  			break;
-@@ -1861,7 +1891,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1854,7 +1884,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev,
  				"TEST 2:  read %d bytes %u times\n",
  				param->length, param->iterations);
@@ -316,7 +304,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		if (!urb) {
  			retval = -ENOMEM;
  			break;
-@@ -1876,7 +1906,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1869,7 +1899,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev,
  				"TEST 3:  write/%d 0..%d bytes %u times\n",
  				param->vary, param->length, param->iterations);
@@ -325,7 +313,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		if (!urb) {
  			retval = -ENOMEM;
  			break;
-@@ -1892,7 +1922,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1885,7 +1915,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev,
  				"TEST 4:  read/%d 0..%d bytes %u times\n",
  				param->vary, param->length, param->iterations);
@@ -334,7 +322,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		if (!urb) {
  			retval = -ENOMEM;
  			break;
-@@ -1918,7 +1948,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1911,7 +1941,7 @@ usbtest_ioctl(struct usb_interface *intf
  		}
  		/* FIRMWARE:  bulk sink (maybe accepts short writes) */
  		retval = perform_sglist(dev, param->iterations, dev->out_pipe,
@@ -343,7 +331,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		free_sglist(sg, param->sglen);
  		break;
  
-@@ -1936,7 +1966,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1929,7 +1959,7 @@ usbtest_ioctl(struct usb_interface *intf
  		}
  		/* FIRMWARE:  bulk source (maybe generates short writes) */
  		retval = perform_sglist(dev, param->iterations, dev->in_pipe,
@@ -352,7 +340,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		free_sglist(sg, param->sglen);
  		break;
  	case 7:
-@@ -1953,7 +1983,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1946,7 +1976,7 @@ usbtest_ioctl(struct usb_interface *intf
  		}
  		/* FIRMWARE:  bulk sink (maybe accepts short writes) */
  		retval = perform_sglist(dev, param->iterations, dev->out_pipe,
@@ -361,7 +349,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		free_sglist(sg, param->sglen);
  		break;
  	case 8:
-@@ -1970,7 +2000,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -1963,7 +1993,7 @@ usbtest_ioctl(struct usb_interface *intf
  		}
  		/* FIRMWARE:  bulk source (maybe generates short writes) */
  		retval = perform_sglist(dev, param->iterations, dev->in_pipe,
@@ -370,7 +358,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  		free_sglist(sg, param->sglen);
  		break;
  
-@@ -2007,7 +2037,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -2000,7 +2030,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev, "TEST 11:  unlink %d reads of %d\n",
  				param->iterations, param->length);
  		for (i = param->iterations; retval == 0 && i--; /* NOP */)
@@ -379,7 +367,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  						param->length);
  		if (retval)
  			dev_err(&intf->dev, "unlink reads failed %d, "
-@@ -2020,7 +2050,7 @@ usbtest_ioctl(struct usb_interface *intf
+@@ -2013,7 +2043,7 @@ usbtest_ioctl(struct usb_interface *intf
  		dev_info(&intf->dev, "TEST 12:  unlink %d writes of %d\n",
  				param->iterations, param->length);
  		for (i = param->iterations; retval == 0 && i--; /* NOP */)
@@ -388,7 +376,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  						param->length);
  		if (retval)
  			dev_err(&intf->dev, "unlink writes failed %d, "
-@@ -2295,10 +2325,22 @@ usbtest_probe(struct usb_interface *intf
+@@ -2288,10 +2318,22 @@ usbtest_probe(struct usb_interface *intf
  				dev->out_pipe = usb_sndbulkpipe(udev,
  							info->ep_out);
  		}

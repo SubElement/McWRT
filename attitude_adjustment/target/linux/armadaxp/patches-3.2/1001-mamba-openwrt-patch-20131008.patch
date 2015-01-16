@@ -4907,7 +4907,7 @@
 +}
 --- a/drivers/usb/core/hub.c
 +++ b/drivers/usb/core/hub.c
-@@ -408,6 +408,11 @@ void usb_kick_khubd(struct usb_device *h
+@@ -407,6 +407,11 @@ void usb_kick_khubd(struct usb_device *h
  {
  	struct usb_hub *hub = hdev_to_hub(hdev);
  
@@ -4919,7 +4919,7 @@
  	if (hub)
  		kick_khubd(hub);
  }
-@@ -673,6 +678,11 @@ int usb_remove_device(struct usb_device
+@@ -669,6 +674,11 @@ int usb_remove_device(struct usb_device
  	struct usb_hub *hub;
  	struct usb_interface *intf;
  
@@ -4931,7 +4931,7 @@
  	if (!udev->parent)	/* Can't remove a root hub */
  		return -EINVAL;
  	hub = hdev_to_hub(udev->parent);
-@@ -1297,6 +1307,11 @@ static int hub_probe(struct usb_interfac
+@@ -1293,6 +1303,11 @@ static int hub_probe(struct usb_interfac
  	desc = intf->cur_altsetting;
  	hdev = interface_to_usbdev(intf);
  
@@ -4943,7 +4943,7 @@
  	/* Hubs have proper suspend/resume support.  USB 3.0 device suspend is
  	 * different from USB 2.0/1.1 device suspend, and unfortunately we
  	 * don't support it yet.  So leave autosuspend disabled for USB 3.0
-@@ -1428,6 +1443,11 @@ int usb_hub_claim_port(struct usb_device
+@@ -1424,6 +1439,11 @@ int usb_hub_claim_port(struct usb_device
  	int rc;
  	void **powner;
  
@@ -4955,7 +4955,7 @@
  	rc = find_port_owner(hdev, port1, &powner);
  	if (rc)
  		return rc;
-@@ -1442,6 +1462,11 @@ int usb_hub_release_port(struct usb_devi
+@@ -1438,6 +1458,11 @@ int usb_hub_release_port(struct usb_devi
  	int rc;
  	void **powner;
  
@@ -4967,7 +4967,7 @@
  	rc = find_port_owner(hdev, port1, &powner);
  	if (rc)
  		return rc;
-@@ -1456,6 +1481,11 @@ void usb_hub_release_all_ports(struct us
+@@ -1452,6 +1477,11 @@ void usb_hub_release_all_ports(struct us
  	int n;
  	void **powner;
  
@@ -4979,7 +4979,7 @@
  	n = find_port_owner(hdev, 1, &powner);
  	if (n == 0) {
  		for (; n < hdev->maxchild; (++n, ++powner)) {
-@@ -1470,6 +1500,11 @@ bool usb_device_is_owned(struct usb_devi
+@@ -1466,6 +1496,11 @@ bool usb_device_is_owned(struct usb_devi
  {
  	struct usb_hub *hub;
  
@@ -4991,7 +4991,7 @@
  	if (udev->state == USB_STATE_NOTATTACHED || !udev->parent)
  		return false;
  	hub = hdev_to_hub(udev->parent);
-@@ -1517,6 +1552,11 @@ void usb_set_device_state(struct usb_dev
+@@ -1513,6 +1548,11 @@ void usb_set_device_state(struct usb_dev
  	unsigned long flags;
  	int wakeup = -1;
  
@@ -5003,9 +5003,9 @@
  	spin_lock_irqsave(&device_state_lock, flags);
  	if (udev->state == USB_STATE_NOTATTACHED)
  		;	/* do nothing */
-@@ -1649,6 +1689,11 @@ void usb_disconnect(struct usb_device **
- 	struct usb_device	*udev = *pdev;
+@@ -1646,6 +1686,11 @@ void usb_disconnect(struct usb_device **
  	int			i;
+ 	struct usb_hcd		*hcd = bus_to_hcd(udev->bus);
  
 +#if defined(CONFIG_USB_ETRON_HUB)
 +	if (usb_is_etron_hcd(*pdev))
@@ -5015,7 +5015,7 @@
  	/* mark the device as inactive, so any further urb submissions for
  	 * this device (and any of its children) will fail immediately.
  	 * this quiesces everything except pending urbs.
-@@ -1869,6 +1914,11 @@ int usb_new_device(struct usb_device *ud
+@@ -1868,6 +1913,11 @@ int usb_new_device(struct usb_device *ud
  {
  	int err;
  
@@ -5027,7 +5027,7 @@
  	if (udev->parent) {
  		/* Initialize non-root-hub device wakeup to disabled;
  		 * device (un)configuration controls wakeup capable
-@@ -1945,6 +1995,11 @@ fail:
+@@ -1936,6 +1986,11 @@ fail:
   */
  int usb_deauthorize_device(struct usb_device *usb_dev)
  {
@@ -5039,7 +5039,7 @@
  	usb_lock_device(usb_dev);
  	if (usb_dev->authorized == 0)
  		goto out_unauthorized;
-@@ -1972,6 +2027,11 @@ int usb_authorize_device(struct usb_devi
+@@ -1963,6 +2018,11 @@ int usb_authorize_device(struct usb_devi
  {
  	int result = 0, c;
  
@@ -5051,7 +5051,7 @@
  	usb_lock_device(usb_dev);
  	if (usb_dev->authorized == 1)
  		goto out_authorized;
-@@ -2392,6 +2452,11 @@ int usb_port_suspend(struct usb_device *
+@@ -2379,6 +2439,11 @@ int usb_port_suspend(struct usb_device *
  	int		port1 = udev->portnum;
  	int		status;
  
@@ -5063,7 +5063,7 @@
  	/* enable remote wakeup when appropriate; this lets the device
  	 * wake up the upstream hub (including maybe the root hub).
  	 *
-@@ -2575,6 +2640,11 @@ int usb_port_resume(struct usb_device *u
+@@ -2558,6 +2623,11 @@ int usb_port_resume(struct usb_device *u
  	int		status;
  	u16		portchange, portstatus;
  
@@ -5075,7 +5075,7 @@
  	/* Skip the initial Clear-Suspend step for a remote wakeup */
  	status = hub_port_status(hub, port1, &portstatus, &portchange);
  	if (status == 0 && !port_is_suspended(hub, portstatus))
-@@ -2647,6 +2717,11 @@ int usb_remote_wakeup(struct usb_device
+@@ -2630,6 +2700,11 @@ int usb_remote_wakeup(struct usb_device
  {
  	int	status = 0;
  
@@ -5087,7 +5087,7 @@
  	if (udev->state == USB_STATE_SUSPENDED) {
  		dev_dbg(&udev->dev, "usb %sresume\n", "wakeup-");
  		status = usb_autoresume_device(udev);
-@@ -2664,6 +2739,11 @@ int usb_remote_wakeup(struct usb_device
+@@ -2647,6 +2722,11 @@ int usb_remote_wakeup(struct usb_device
  
  int usb_port_suspend(struct usb_device *udev, pm_message_t msg)
  {
@@ -5099,7 +5099,7 @@
  	return 0;
  }
  
-@@ -2676,6 +2756,11 @@ int usb_port_resume(struct usb_device *u
+@@ -2659,6 +2739,11 @@ int usb_port_resume(struct usb_device *u
  	int		status;
  	u16		portchange, portstatus;
  
@@ -5111,7 +5111,7 @@
  	status = hub_port_status(hub, port1, &portstatus, &portchange);
  	status = check_port_resume_type(udev,
  			hub, port1, status, portchange, portstatus);
-@@ -2748,6 +2833,11 @@ static int hub_reset_resume(struct usb_i
+@@ -2731,6 +2816,11 @@ static int hub_reset_resume(struct usb_i
   */
  void usb_root_hub_lost_power(struct usb_device *rhdev)
  {
@@ -5123,7 +5123,7 @@
  	dev_warn(&rhdev->dev, "root hub lost power or was reset\n");
  	rhdev->reset_resume = 1;
  }
-@@ -2819,6 +2909,11 @@ static int hub_port_debounce(struct usb_
+@@ -2802,6 +2892,11 @@ static int hub_port_debounce(struct usb_
  
  void usb_ep0_reinit(struct usb_device *udev)
  {
@@ -5135,7 +5135,7 @@
  	usb_disable_endpoint(udev, 0 + USB_DIR_IN, true);
  	usb_disable_endpoint(udev, 0 + USB_DIR_OUT, true);
  	usb_enable_endpoint(udev, &udev->ep0, true);
-@@ -4041,6 +4136,11 @@ int usb_reset_device(struct usb_device *
+@@ -4010,6 +4105,11 @@ int usb_reset_device(struct usb_device *
  	int i;
  	struct usb_host_config *config = udev->actconfig;
  
@@ -20329,7 +20329,7 @@
 +#endif /* __LINUX_XHCI_HCD_H */
 --- a/drivers/usb/host/xhci-pci.c
 +++ b/drivers/usb/host/xhci-pci.c
-@@ -152,6 +152,9 @@ static int xhci_pci_probe(struct pci_dev
+@@ -135,6 +135,9 @@ static int xhci_pci_probe(struct pci_dev
  	struct hc_driver *driver;
  	struct usb_hcd *hcd;
  
@@ -20339,17 +20339,6 @@
  	driver = (struct hc_driver *)id->driver_data;
  	/* Register the USB 2.0 roothub.
  	 * FIXME: USB core must know to register the USB 2.0 roothub first.
---- a/drivers/usb/storage/Kconfig
-+++ b/drivers/usb/storage/Kconfig
-@@ -203,7 +203,7 @@ config USB_STORAGE_ENE_UB6250
- 
- config USB_UAS
- 	tristate "USB Attached SCSI"
--	depends on USB && SCSI && BROKEN
-+	depends on USB && SCSI
- 	help
- 	  The USB Attached SCSI protocol is supported by some USB
- 	  storage devices.  It permits higher performance by supporting
 --- a/drivers/usb/storage/uas.c
 +++ b/drivers/usb/storage/uas.c
 @@ -8,12 +8,19 @@

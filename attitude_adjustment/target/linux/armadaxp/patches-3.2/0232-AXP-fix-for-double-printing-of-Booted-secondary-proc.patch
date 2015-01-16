@@ -11,7 +11,7 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
 
 --- a/arch/arm/kernel/smp.c
 +++ b/arch/arm/kernel/smp.c
-@@ -311,9 +311,6 @@ asmlinkage void __cpuinit secondary_star
+@@ -305,9 +305,6 @@ asmlinkage void __cpuinit secondary_star
  
  	__asm__ __volatile__("mrc p15, 1, %0, c0, c0, 7   @ read CPU ID reg\n"
  		: "=r" (cpurev) :: "memory");
@@ -21,16 +21,3 @@ Signed-off-by: Seif Mazareeb <seif@marvell.com>
  #endif
  
  	/*
-@@ -325,7 +322,11 @@ asmlinkage void __cpuinit secondary_star
- 	current->active_mm = mm;
- 	cpumask_set_cpu(cpu, mm_cpumask(mm));
- 
--	printk("CPU%u: Booted secondary processor\n", cpu);
-+#ifdef CONFIG_MACH_ARMADA_XP_FPGA
-+        printk("CPU%u: FPGA Booted secondary processor (ID 0x%04x)\n", cpu, (cpurev & 0xFFFF));
-+#else
-+        printk("CPU%u: Booted secondary processor\n", cpu);
-+#endif
- 
- 	cpu_init();
- 	preempt_disable();
