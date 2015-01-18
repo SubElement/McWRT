@@ -17,7 +17,7 @@ define KernelPackage/button-hotplug
   SUBMENU:=Other modules
   TITLE:=Button Hotplug driver
   FILES:=$(PKG_BUILD_DIR)/button-hotplug.ko
-  AUTOLOAD:=$(call AutoLoad,99,button-hotplug)
+  AUTOLOAD:=$(call AutoLoad,60,button-hotplug)
   KCONFIG:=
 endef
 
