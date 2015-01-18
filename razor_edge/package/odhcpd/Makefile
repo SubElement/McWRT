@@ -37,7 +37,7 @@ endif
 define Package/odhcpd
   SECTION:=ipv6
   CATEGORY:=IPv6
-  TITLE:=Embedded DHCP/DHCPv6(-PD)/RA Server & Relay
+  TITLE:=OpenWrt DHCP/DHCPv6(-PD)/RA Server & Relay
   DEPENDS:=+libubox +libuci +libubus
 endef
 
