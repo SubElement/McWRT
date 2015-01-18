@@ -1,0 +1,11 @@
+--- a/arch/arm/include/asm/checksum.h
++++ b/arch/arm/include/asm/checksum.h
+@@ -98,7 +98,7 @@ csum_tcpudp_nofold(__be32 saddr, __be32
+ 	"adcs	%0, %0, %5					\n\
+ 	adc	%0, %0, #0"
+ 	: "=&r"(sum)
+-	: "r" (sum), "r" (daddr), "r" (saddr), "r" (len), "Ir" (htons(proto))
++	: "r" (sum), "r" (daddr), "r" (saddr), "r" ((unsigned int) len), "Ir" (htons(proto))
+ 	: "cc");
+ 	return sum;
+ }	
