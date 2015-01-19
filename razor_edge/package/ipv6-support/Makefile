@@ -16,7 +16,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ipv6-support
   SECTION:=ipv6
   CATEGORY:=IPv6
-  DEPENDS:=+kmod-ipv6 +ip6tables +dnsmasq-dhcpv6 +odhcp6c +6in4 +6rd +6to4 +ds-lite
+  DEPENDS:=+kmod-ipv6 +ip6tables +6relayd +odhcp6c +6in4 +6rd +6to4 +ds-lite
   TITLE:=Extended IPv6-support for home routers (meta package)
   MAINTAINER:=Steven Barth <steven@midlink.org>
   PKGARCH:=all
