@@ -17,12 +17,10 @@ https://github.com/jimmychungbelkin/Mamba
 
 You need to have installed gcc, binutils, patch, bzip2, flex, make, gettext, pkg-config, unzip, libz-dev, libc headers and Subversion 1.7.
 
-For the Feeds to update (update.sh) from packages_12.09 you will need to have Subversion 1.7 installed.
-http://sagar.se/svn-1.7-on-wheezy.html
 
 -
 
-**To build the image run "update.sh", "make V=s" and then when prompted press enter a lot of times :-) If successful the image should be in the "bin" directory.**
+**To build the image run "make V=s" and then when prompted press enter a lot of times :-) If successful the image should be in the "bin" directory.**
 
 **Flashing firmware should be done connect to the router with an Ethernet cable.**
 
