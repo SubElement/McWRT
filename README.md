@@ -1,6 +1,6 @@
 McWRT
 =====
-OpenWRT McWRT Chaos Calmer is under development. Unless you have a USB to TTL cable Attitude Adjustment Release AAv1.0.8 should be used.
+Unless you have a USB to TTL cable Attitude Adjustment Release AAv1.0.8 should be used.
 ===
 
 ###An OpenWRT project for the Linksys WRT1900AC router.
